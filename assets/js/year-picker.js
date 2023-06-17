@@ -10,110 +10,83 @@ window.YearPicker = (function () {
     ComponentId: "",
   };
 
-  function initBaseContainer(container, componentId) {
+  function GetYearInfo(startYear, endYear) {
+    const yearGroups = [];
+    let ages = {};
+    let tempArray = [];
+    for (let i = startYear; i <= endYear; i++) {
+      const age = ("" + i).slice(2, -1) + "0s";
+      ages[age] = true;
+      tempArray.push({ year: i, state: "normal" });
+      if (tempArray.length === 5) {
+        yearGroups.push(tempArray);
+        tempArray = [];
+      }
+    }
+
+    if (tempArray.length > 0) {
+      yearGroups.push(tempArray);
+    }
+
+    return { ages: Object.keys(ages), groups: yearGroups };
+  }
+
+  function initTableHead(datasets) {
+    let tpl = [];
+    for (let i = 0; i < datasets.length; i++) {
+      tpl.push(`<th colspan="2">${datasets[i]}</th>`);
+    }
+    return `<tr>${tpl.join("")}</tr>`;
+  }
+
+  function initTableBody(datasets) {
+    let chunks = {};
+    for (let i = 0; i < datasets.length; i++) {
+      const age = ("" + datasets[i][0]).slice(2, -1) + "0s";
+      chunks[age] = chunks[age] || [];
+      if (datasets[i].length < 5) {
+        const diff = 5 - datasets[i].length;
+        const last = datasets[i][datasets[i].length - 1].year + 1;
+        for (let j = last; j < last + diff; j++) {
+          console.log(last);
+          datasets[i].push({ year: last, state: "disabled" });
+        }
+      }
+      chunks[age].push(datasets[i]);
+    }
+
+    let tpl = [];
+    for (let key in chunks) {
+      for (let i = 0; i < chunks[key].length; i++) {
+        tpl.push(`<td>`);
+        for (let j = 0; j < chunks[key][i].length; j++) {
+          const { year, state } = chunks[key][i][j];
+          console.log(year, state);
+          if (state === "disabled") {
+            tpl.push(`<div class="year-picker-item year-picker-item-disabled">${year}</div>`);
+          } else {
+            tpl.push(`<div class="year-picker-item">${year}</div>`);
+          }
+        }
+        tpl.push("</td>");
+      }
+    }
+    return `<tr>${tpl.join("")}</tr>`;
+  }
+
+  // year-picker-item-active
+  //
+
+  function initBaseContainer(container, componentId, startYear, endYear) {
+    const datasets = GetYearInfo(startYear, endYear);
     const template = `
         <div id="${componentId}" class="year-picker-container">
         <table>
-            <thead>
-                <tr>
-                    <th colspan="2">70s</th>
-                    <th colspan="2">80s</th>
-                    <th colspan="2">90s</th>
-                    <th colspan="2">00s</th>
-                    <th colspan="2">10s</th>
-                    <th colspan="2">20s</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <div class="year-picker-item">1970</div>
-                        <div class="year-picker-item">1971</div>
-                        <div class="year-picker-item year-picker-item-active">1972</div>
-                        <div class="year-picker-item year-picker-item-active">1973</div>
-                        <div class="year-picker-item year-picker-item-active">1974</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item year-picker-item-active">1975</div>
-                        <div class="year-picker-item year-picker-item-active">1976</div>
-                        <div class="year-picker-item year-picker-item-active">1977</div>
-                        <div class="year-picker-item year-picker-item-active">1978</div>
-                        <div class="year-picker-item">1979</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item">1980</div>
-                        <div class="year-picker-item">1981</div>
-                        <div class="year-picker-item">1982</div>
-                        <div class="year-picker-item">1983</div>
-                        <div class="year-picker-item">1984</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item">1985</div>
-                        <div class="year-picker-item">1986</div>
-                        <div class="year-picker-item">1987</div>
-                        <div class="year-picker-item">1988</div>
-                        <div class="year-picker-item">1989</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item">1990</div>
-                        <div class="year-picker-item year-picker-item-active">1991</div>
-                        <div class="year-picker-item">1992</div>
-                        <div class="year-picker-item year-picker-item-active">1993</div>
-                        <div class="year-picker-item">1994</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item">1995</div>
-                        <div class="year-picker-item">1996</div>
-                        <div class="year-picker-item">1997</div>
-                        <div class="year-picker-item">1998</div>
-                        <div class="year-picker-item">1999</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item">2000</div>
-                        <div class="year-picker-item">2001</div>
-                        <div class="year-picker-item">2002</div>
-                        <div class="year-picker-item">2003</div>
-                        <div class="year-picker-item year-picker-item-active">2004</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item year-picker-item-active">2005</div>
-                        <div class="year-picker-item year-picker-item-active">2006</div>
-                        <div class="year-picker-item">2007</div>
-                        <div class="year-picker-item">2008</div>
-                        <div class="year-picker-item">2009</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item">2010</div>
-                        <div class="year-picker-item">2011</div>
-                        <div class="year-picker-item">2012</div>
-                        <div class="year-picker-item">2013</div>
-                        <div class="year-picker-item">2014</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item">2015</div>
-                        <div class="year-picker-item">2016</div>
-                        <div class="year-picker-item">2017</div>
-                        <div class="year-picker-item">2018</div>
-                        <div class="year-picker-item">2019</div>
-                    </td>
-                    <td>
-                        <div class="year-picker-item">2020</div>
-                        <div class="year-picker-item">2021</div>
-                        <div class="year-picker-item">2022</div>
-                        <div class="year-picker-item">2023</div>
-                        <div class="year-picker-item year-picker-item-disabled">2024</div>
-                    </td>
-                    <td>
-                    </td>
-                </tr>
-
-
-
-            </tbody>
+            <thead>${initTableHead(datasets.ages)}</thead>
+            <tbody>${initTableBody(datasets.groups)}</tbody>
         </table>
     </div>
       `;
-
     document.querySelector(container).innerHTML = template;
   }
 
@@ -131,12 +104,14 @@ window.YearPicker = (function () {
     document.getElementById(Picker.ComponentId).classList.add("hide");
   }
 
-  function bootstrap(container, options) {
+  function bootstrap(container, options = {}) {
     const componentId = "year-picker-" + Math.random().toString(36).slice(-6);
     Picker.ComponentId = componentId;
     Picker.options = options;
     Picker.Selected = [];
-    initBaseContainer(container, componentId);
+    const startYear = options.startYear || 1970;
+    const endYear = options.endYear || new Date().getFullYear();
+    initBaseContainer(container, componentId, startYear, endYear);
 
     return Picker;
   }
