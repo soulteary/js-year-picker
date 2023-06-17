@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" class="demo">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Demo</title>
+
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/year-picker.css">
+
+    <style>
+        .demo body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .demo #container {
+            margin: 0 auto;
+            display: block;
+            position: relative;
+            width: auto;
+            height: 600px;
+            padding: 10px;
+        }
+
+        .demo #container .picker-box {
+            position: relative;
+            margin: 40px auto;
+        }
+
+        .demo #demo-topbar {
+            width: 240px;
+            margin: 40px auto;
+        }
+
+        .demo #demo-topbar button {
+            width: 80px;
+            margin: 4px;
+            padding: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="demo-topbar">
+        <button id="show-modal">Show Modal</button>
+        <button id="hide-modal">Hide Modal</button>
+    </div>
+
+    <div id="container">
+        <!-- container for region picker -->
+    </div>
+
+    <script src="assets/js/year-picker.js"></script>
+    <script>
+        let instance = YearPicker("#container");
+        document.getElementById('show-modal').addEventListener('click', instance.Show);
+        document.getElementById('hide-modal').addEventListener('click', instance.Hide);
+        document.getElementById('show-modal').click(); // switch modal to show instead of hide (default)
+    </script>
+</body>
+
+</html>
