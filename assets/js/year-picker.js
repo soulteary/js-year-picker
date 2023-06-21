@@ -72,6 +72,18 @@ window.YearPicker = (function () {
     return `<tr>${tpl.join("")}</tr>`;
   }
 
+  function UpdateSelected(startYear, endYear) {
+    const yearItems = document.querySelectorAll(".year-picker-item");
+    yearItems.forEach((item) => {
+      const itemYear = parseInt(item.innerText);
+      if (itemYear >= startYear && itemYear <= endYear) {
+        item.classList.add("year-picker-item-selected");
+      } else {
+        item.classList.remove("year-picker-item-selected");
+      }
+    });
+  }
+
   function handleYearSelection(event) {
     const target = event.target;
     const yearItem = target.closest(".year-picker-item");
@@ -94,7 +106,7 @@ window.YearPicker = (function () {
           Picker.Selected.push(endYear);
 
           const yearItems = document.querySelectorAll(".year-picker-item");
-          yearItems.forEach(item => {
+          yearItems.forEach((item) => {
             const itemYear = parseInt(item.innerText);
             if (itemYear >= Math.min(startYear, endYear) && itemYear <= Math.max(startYear, endYear)) {
               item.classList.add("year-picker-item-selected");
@@ -108,7 +120,7 @@ window.YearPicker = (function () {
         Picker.Selected = [selectedYear];
 
         const yearItems = document.querySelectorAll(".year-picker-item");
-        yearItems.forEach(item => {
+        yearItems.forEach((item) => {
           if (item !== yearItem) {
             item.classList.remove("year-picker-item-selected");
           }
@@ -148,11 +160,12 @@ window.YearPicker = (function () {
     const componentId = "year-picker-" + Math.random().toString(36).slice(-6);
     Picker.ComponentId = componentId;
     Picker.options = options;
-    Picker.Selected = [];
+    const currentYear = new Date().getFullYear();
+    Picker.Selected = [currentYear - 10, currentYear];
     const startYear = options.startYear || 1970;
     const endYear = options.endYear || new Date().getFullYear();
     initBaseContainer(container, componentId, startYear, endYear);
-
+    UpdateSelected(Picker.Selected[0], Picker.Selected[1]);
     return Picker;
   }
 
