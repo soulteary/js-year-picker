@@ -4,7 +4,7 @@
   "private": true,
   "description": "A JavaScript Year Range Picker written by vanilla JS.",
   "scripts": {
-    "build": "npx google-closure-compiler --js assets/js/year-picker.js --language_out=ECMASCRIPT5 --js_output_file assets/js/year-picker.min.js --isolation_mode=IIFE"
+    "build": "npx google-closure-compiler --js ../assets/js/year-picker.js --language_out=ECMASCRIPT5 --js_output_file ../assets/js/year-picker.min.js --isolation_mode=IIFE"
   },
   "repository": {
     "type": "git",
