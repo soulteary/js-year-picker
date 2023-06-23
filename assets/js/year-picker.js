@@ -167,7 +167,7 @@ window.YearPicker = function (container, options = {}) {
         const endYear = selectedYear;
 
         if (startYear === endYear) {
-          yearItem.classList.remove("year-picker-item-selected");
+          item.className = item.className.replace(/\s?year-picker-item-selected/g, "");
           Picker.Selected = [];
         } else {
           Picker.Selected.push(endYear);
@@ -191,7 +191,7 @@ window.YearPicker = function (container, options = {}) {
         const yearItems = container.querySelectorAll(".year-picker-item");
         yearItems.forEach((item) => {
           if (item !== yearItem) {
-            item.classList.remove("year-picker-item-selected");
+            item.className = item.className.replace(/\s?year-picker-item-selected/g, "");
           }
         });
       }
