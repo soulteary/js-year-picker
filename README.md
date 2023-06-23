@@ -2,6 +2,8 @@
 
 A JavaScript Year Range Picker written by vanilla JS.
 
+![](.github/demo.gif)
+
 ## Useage
 
 If you want to use some configuration when the program is rendered, you can consider using the following code:
