@@ -43,13 +43,18 @@
 
 .year-picker-container .year-picker-item:hover {
   background: #eaf0f3;
-  font-weight: bold;
   font-style: italic;
 }
 
 .year-picker-container .year-picker-item.year-picker-item-selected {
   background: #eaf0f3;
   font-weight: bold;
+}
+
+.year-picker-container .year-picker-item.year-picker-item-selected:hover {
+  background: #eaf0f3;
+  font-weight: bold;
+  font-style: normal;
 }
 
 .year-picker-container .year-picker-item.year-picker-item-disabled {

@@ -14,6 +14,20 @@ window.YearPicker = function (container, options = {}) {
     return this.Selected;
   }
 
+  function SetItemState(item, state) {
+    const YEAR_ITEM_NORMAL = "year-picker-item";
+    const YEAR_ITEM_SELECTED = "year-picker-item year-picker-item-selected";
+    if (!item) return;
+    switch (state) {
+      case "normal":
+        item.className = YEAR_ITEM_NORMAL;
+        break;
+      case "selected":
+        item.className = YEAR_ITEM_SELECTED;
+        break;
+    }
+  }
+
   function UpdateUISelected() {
     const [startYear, endYear] = Picker.Selected;
     const yearItems = document.querySelectorAll(`#${Picker.ComponentId} .year-picker-item`);
@@ -23,15 +37,15 @@ window.YearPicker = function (container, options = {}) {
       if (!isDisabled) {
         if (startYear && endYear) {
           if (itemYear >= startYear && itemYear <= endYear) {
-            item.className = "year-picker-item year-picker-item-selected";
+            SetItemState(item, "selected");
           } else {
-            item.className = "year-picker-item";
+            SetItemState(item, "normal");
           }
         } else {
           if (itemYear == startYear) {
-            item.className = "year-picker-item year-picker-item-selected";
+            SetItemState(item, "selected");
           } else {
-            item.className = "year-picker-item";
+            SetItemState(item, "normal");
           }
         }
       }
@@ -113,7 +127,7 @@ window.YearPicker = function (container, options = {}) {
       const selectedYear = parseInt(yearItem.innerText);
 
       if (Picker.Selected.length === 0) {
-        yearItem.classList.add("year-picker-item-selected");
+        SetItemState(yearItem, "selected");
         Picker.Selected.push(selectedYear);
       } else if (Picker.Selected.length === 1) {
         const startYear = Picker.Selected[0];
@@ -129,14 +143,17 @@ window.YearPicker = function (container, options = {}) {
           yearItems.forEach((item) => {
             const itemYear = parseInt(item.innerText);
             if (itemYear >= Math.min(startYear, endYear) && itemYear <= Math.max(startYear, endYear)) {
-              item.classList.add("year-picker-item-selected");
+              SetItemState(item, "selected");
             } else {
-              item.classList.remove("year-picker-item-selected");
+              const isDisabled = (item.className || "").indexOf("year-picker-item-disabled") > -1;
+              if (!isDisabled) {
+                SetItemState(item, "normal");
+              }
             }
           });
         }
       } else {
-        yearItem.classList.add("year-picker-item-selected");
+        SetItemState(yearItem, "selected");
         Picker.Selected = [selectedYear];
 
         const yearItems = container.querySelectorAll(".year-picker-item");
@@ -167,11 +184,13 @@ window.YearPicker = function (container, options = {}) {
   }
 
   function ShowPicker() {
-    document.getElementById(Picker.ComponentId).classList.remove("hide");
+    const container = document.getElementById(Picker.ComponentId);
+    container.className = container.className.replace(/\s?hide/g, "");
   }
 
   function HidePicker() {
-    document.getElementById(Picker.ComponentId).classList.add("hide");
+    const container = document.getElementById(Picker.ComponentId);
+    container.className = container.className + " hide";
   }
 
   function Bootstrap(container, options = {}) {
