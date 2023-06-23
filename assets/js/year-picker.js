@@ -28,13 +28,18 @@ window.YearPicker = function (container, options = {}) {
     }
   }
 
+  function IsDisabled(item) {
+    if (!item) return true;
+    const isDisabled = (item.className || "").indexOf("year-picker-item-disabled") > -1;
+    return isDisabled;
+  }
+
   function UpdateUISelected() {
     const [startYear, endYear] = Picker.Selected;
     const yearItems = document.querySelectorAll(`#${Picker.ComponentId} .year-picker-item`);
     yearItems.forEach((item) => {
       const itemYear = parseInt(item.innerText);
-      const isDisabled = (item.className || "").indexOf("year-picker-item-disabled") > -1;
-      if (!isDisabled) {
+      if (!IsDisabled(item)) {
         if (startYear && endYear) {
           if (itemYear >= startYear && itemYear <= endYear) {
             SetItemState(item, "selected");
@@ -53,31 +58,62 @@ window.YearPicker = function (container, options = {}) {
   }
 
   function InitBaseContainer(container, componentId, startYear, endYear) {
+    function generateYearRange(start, end) {
+      const prefix = start % 5;
+      const append = end % 5;
+      let years = [];
+      const lastNum = ("" + end).slice(-1);
+
+      if (prefix > 0) {
+        for (let i = start - prefix; i < start; i++) {
+          years.push({ year: i, state: "disabled" });
+        }
+      }
+      for (let i = start; i <= end; i++) {
+        years.push({ year: i, state: "normal" });
+      }
+      if (lastNum !== "9" || lastNum !== 4) {
+        for (let i = end + 1; i < end + (5 - append); i++) {
+          years.push({ year: i, state: "disabled" });
+        }
+      }
+      return years;
+    }
+
     function getYearInfo(startYear, endYear) {
       const yearGroups = [];
       let ages = {};
-      let tempArray = [];
-      for (let i = startYear; i <= endYear; i++) {
-        const age = ("" + i).slice(2, -1) + "0s";
+      let tmpArr = [];
+      generateYearRange(startYear, endYear).forEach((item) => {
+        const age = ("" + item.year).slice(2, -1) + "0s";
         ages[age] = true;
-        tempArray.push({ year: i, state: "normal" });
-        if (tempArray.length === 5) {
-          yearGroups.push(tempArray);
-          tempArray = [];
+        tmpArr.push(item);
+        if (tmpArr.length === 5) {
+          yearGroups.push(tmpArr);
+          tmpArr = [];
         }
-      }
-
-      if (tempArray.length > 0) {
-        yearGroups.push(tempArray);
-      }
-
+      });
       return { ages: Object.keys(ages), groups: yearGroups };
     }
 
-    function initTableHead(datasets) {
+    function initTableHead(labels, datasets) {
       let tpl = [];
-      for (let i = 0; i < datasets.length; i++) {
-        tpl.push(`<th colspan="2">${datasets[i]}</th>`);
+      for (let i = 0; i < labels.length; i++) {
+        let useSingleCol = false;
+        if (i === 0) {
+          if (labels.length === 1) {
+            useSingleCol = true;
+          } else if (labels.length > 1) {
+            if (("" + datasets[0][0].year).slice(2, -1) !== ("" + datasets[1][0].year).slice(2, -1)) {
+              useSingleCol = true;
+            }
+          }
+        }
+        if (useSingleCol) {
+          tpl.push(`<th colspan="1">${labels[i]}</th>`);
+        } else {
+          tpl.push(`<th colspan="2">${labels[i]}</th>`);
+        }
       }
       return `<tr>${tpl.join("")}</tr>`;
     }
@@ -87,13 +123,6 @@ window.YearPicker = function (container, options = {}) {
       for (let i = 0; i < datasets.length; i++) {
         const age = ("" + datasets[i][0]).slice(2, -1) + "0s";
         chunks[age] = chunks[age] || [];
-        if (datasets[i].length < 5) {
-          const diff = 5 - datasets[i].length;
-          const last = datasets[i][datasets[i].length - 1].year + 1;
-          for (let j = last; j < last + diff; j++) {
-            datasets[i].push({ year: last, state: "disabled" });
-          }
-        }
         chunks[age].push(datasets[i]);
       }
 
@@ -119,10 +148,7 @@ window.YearPicker = function (container, options = {}) {
       const target = event.target;
       const container = target.closest(".year-picker-container");
       const yearItem = target.closest(".year-picker-item");
-      if (!yearItem || !container) return;
-
-      const isDisabled = (yearItem.className || "").indexOf("year-picker-item-disabled") > -1;
-      if (isDisabled) return;
+      if (!yearItem || !container || IsDisabled(yearItem)) return;
 
       const selectedYear = parseInt(yearItem.innerText);
 
@@ -145,8 +171,7 @@ window.YearPicker = function (container, options = {}) {
             if (itemYear >= Math.min(startYear, endYear) && itemYear <= Math.max(startYear, endYear)) {
               SetItemState(item, "selected");
             } else {
-              const isDisabled = (item.className || "").indexOf("year-picker-item-disabled") > -1;
-              if (!isDisabled) {
+              if (!IsDisabled(item)) {
                 SetItemState(item, "normal");
               }
             }
@@ -174,7 +199,7 @@ window.YearPicker = function (container, options = {}) {
     const template = `
         <div id="${componentId}" class="year-picker-container">
           <table>
-            <thead>${initTableHead(datasets.ages)}</thead>
+            <thead>${initTableHead(datasets.ages, datasets.groups)}</thead>
             <tbody>${initTableBody(datasets.groups)}</tbody>
           </table>
         </div>
