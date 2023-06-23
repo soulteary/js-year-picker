@@ -1,31 +1,63 @@
 <!DOCTYPE html>
-<html lang="en" class="demo">
+<html lang="en" translate="no" class="notranslate demo">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Demo</title>
-
-    <link rel="stylesheet" href="assets/css/common.css">
-    <link rel="stylesheet" href="assets/css/year-picker.css">
-
+    <title>Year Picker Demo</title>
+    <meta name="google" content="notranslate">
     <style>
+        *,
+        *:before,
+        *:after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            position: relative;
+            margin: 0 auto;
+            font: 12px "Noto Sans SC", "Open Sans";
+            background-color: #ffffff;
+            color: #333333;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            -moz-tap-highlight-color: rgba(0, 0, 0, 0);
+            -ms-tap-highlight-color: rgba(0, 0, 0, 0);
+            -o-tap-highlight-color: rgba(0, 0, 0, 0);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-font-smoothing: antialiased;
+            -ms-font-smoothing: antialiased;
+            -o-font-smoothing: antialiased;
+        }
+
+        html,
+        body {
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+            -o-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+
+
         .demo body {
             width: 100vw;
             height: 100vh;
             overflow: hidden;
         }
 
-        .demo #container {
+        .demo .container {
             margin: 0 auto;
             display: block;
             position: relative;
             width: auto;
-            height: 600px;
+            height: 300px;
             padding: 10px;
         }
 
-        .demo #container .picker-box {
+        .demo .container .picker-box {
             position: relative;
             margin: 40px auto;
         }
@@ -41,6 +73,7 @@
             padding: 8px;
         }
     </style>
+    <link rel="stylesheet" href="assets/css/year-picker.css">
 </head>
 
 <body>
@@ -49,15 +82,38 @@
         <button id="hide-modal">Hide Modal</button>
     </div>
 
-    <div id="container">
+    <div id="container" class="container">
         <!-- container for region picker -->
     </div>
 
+    <hr>
+
+    <div id="container2" class="container">
+        <!-- container for region picker -->
+    </div>
+
+    <hr>
+
+    <div id="container3" class="container">
+        <!-- container for region picker -->
+    </div>
+
+
     <script src="assets/js/year-picker.js"></script>
     <script>
-        let instance = YearPicker("#container");
-        document.getElementById('show-modal').addEventListener('click', instance.Show);
-        document.getElementById('hide-modal').addEventListener('click', instance.Hide);
+        let instance1 = YearPicker("#container", { preselected: [2020], updater: (selected) => { console.log("instance1", selected) } });
+        let instance2 = YearPicker("#container2", { preselected: 2020, range: [2019, 2030], updater: (selected) => { console.log("instance2", selected) } });
+        let instance3 = YearPicker("#container3", { preselected: [2015, 2018], range: [2010, 2025], updater: (selected) => { console.log("instance3", selected) } });
+        document.getElementById('show-modal').addEventListener('click', () => {
+            instance1.Show();
+            instance2.Show();
+            instance3.Show();
+        });
+        document.getElementById('hide-modal').addEventListener('click', () => {
+            instance1.Hide();
+            instance2.Hide();
+            instance3.Hide();
+        });
         document.getElementById('show-modal').click(); // switch modal to show instead of hide (default)
     </script>
 </body>

@@ -1,3 +1,14 @@
+/* reset */
+.year-picker-container div {
+  margin: 0;
+  padding: 0;
+}
+
+/* utils */
+.year-picker-container.hide {
+  display: none;
+}
+
 .year-picker-container {
   position: absolute;
   z-index: 999;
@@ -16,7 +27,7 @@
   font-weight: bold;
 }
 
-.year-picker-item {
+.year-picker-container .year-picker-item {
   width: 80px;
   height: 34px;
   background: #ffffff;
@@ -30,18 +41,25 @@
   user-select: none;
 }
 
-.year-picker-item:hover {
+.year-picker-container .year-picker-item:hover {
   background: #eaf0f3;
   font-weight: bold;
   font-style: italic;
 }
 
-.year-picker-item.year-picker-item-selected {
+.year-picker-container .year-picker-item.year-picker-item-selected {
   background: #eaf0f3;
   font-weight: bold;
 }
 
-.year-picker-item.year-picker-item-disabled {
+.year-picker-container .year-picker-item.year-picker-item-disabled {
   color: #cccccc;
   cursor: not-allowed;
+}
+
+
+.year-picker-container .year-picker-item.year-picker-item-disabled:hover {
+  background: #fff;
+  font-weight: normal;
+  font-style: normal;
 }
