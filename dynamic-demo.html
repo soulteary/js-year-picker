@@ -45,7 +45,6 @@
         .demo body {
             width: 100vw;
             height: 100vh;
-            overflow: hidden;
         }
 
         .demo .container {
@@ -81,6 +80,15 @@
             margin: 4px;
             padding: 8px;
         }
+
+        .demo .debug-output {
+            background: #000;
+            color: #fff;
+            height: 50px;
+            line-height: 2;
+            font-size: 25px;
+            text-align: center;
+        }
     </style>
     <link rel="stylesheet" href="assets/css/year-picker.css">
 </head>
@@ -94,28 +102,40 @@
         </div>
     </div>
 
-    <div id="container" class="container">
+    <div id="container1" class="container">
         <!-- container for region picker -->
     </div>
-
+    <div id="container1-output" class="debug-output"></div>
     <hr>
 
     <div id="container2" class="container">
         <!-- container for region picker -->
     </div>
-
+    <div id="container2-output" class="debug-output"></div>
     <hr>
 
     <div id="container3" class="container">
         <!-- container for region picker -->
     </div>
-
+    <div id="container3-output" class="debug-output"></div>
 
     <script src="assets/js/year-picker.js"></script>
     <script>
-        let instance1 = YearPicker("#container", { preselected: [2020], updater: (selected) => { console.log("instance1", selected) } });
-        let instance2 = YearPicker("#container2", { preselected: 2020, range: [2019, 2030], updater: (selected) => { console.log("instance2", selected) } });
-        let instance3 = YearPicker("#container3", { preselected: [2015, 2018], range: [2010, 2025], updater: (selected) => { console.log("instance3", selected) } });
+        let instance1 = YearPicker("#container1", {
+            preselected: [2020], updater: (selected) => {
+                document.getElementById('container1-output').innerHTML = JSON.stringify(selected);
+            }
+        });
+        let instance2 = YearPicker("#container2", {
+            preselected: 2020, range: [2019, 2030], updater: (selected) => {
+                document.getElementById('container2-output').innerHTML =  JSON.stringify(selected);
+            }
+        });
+        let instance3 = YearPicker("#container3", {
+            preselected: [2015, 2018], range: [2010, 2025], updater: (selected) => {
+                document.getElementById('container3-output').innerHTML =  JSON.stringify(selected);
+            }
+        });
         document.getElementById('show-modal').addEventListener('click', () => {
             instance1.Show();
             instance2.Show();

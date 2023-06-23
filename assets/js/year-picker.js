@@ -34,6 +34,13 @@ window.YearPicker = function (container, options = {}) {
     return isDisabled;
   }
 
+  function Feedback() {
+    if (Picker.Options && Picker.Options.updater && typeof Picker.Options.updater === "function") {
+      Picker.Selected.sort((a, b) => a - b);
+      Picker.Options.updater(Picker.Selected);
+    }
+  }
+
   function UpdateUISelected() {
     const [startYear, endYear] = Picker.Selected;
     const yearItems = document.querySelectorAll(`#${Picker.ComponentId} .year-picker-item`);
@@ -189,10 +196,7 @@ window.YearPicker = function (container, options = {}) {
         });
       }
 
-      if (Picker.Options && Picker.Options.updater && typeof Picker.Options.updater === "function") {
-        Picker.Selected.sort((a, b) => a - b);
-        Picker.Options.updater(Picker.Selected);
-      }
+      Feedback();
     }
 
     const datasets = getYearInfo(startYear, endYear);
@@ -245,6 +249,9 @@ window.YearPicker = function (container, options = {}) {
     const [begin, end] = range || [1970, new Date().getFullYear()];
     InitBaseContainer(container, componentId, begin, end);
     UpdateUISelected();
+
+    Feedback();
+
     return Picker;
   }
 
