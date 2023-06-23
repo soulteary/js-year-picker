@@ -107,6 +107,9 @@ window.YearPicker = function (container, options = {}) {
       const yearItem = target.closest(".year-picker-item");
       if (!yearItem || !container) return;
 
+      const isDisabled = (yearItem.className || "").indexOf("year-picker-item-disabled") > -1;
+      if (isDisabled) return;
+
       const selectedYear = parseInt(yearItem.innerText);
 
       if (Picker.Selected.length === 0) {
