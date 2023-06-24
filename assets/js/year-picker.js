@@ -4,6 +4,7 @@ window.YearPicker = function (container, options = {}) {
     ComponentId: "",
     Options: {},
     Selected: [],
+    Visiable: false,
     // expose functions
     GetSelected: GetSelected,
     Show: ShowPicker,
@@ -200,8 +201,9 @@ window.YearPicker = function (container, options = {}) {
     }
 
     const datasets = getYearInfo(startYear, endYear);
+    const visiableClass = Picker.Visiable ? "" : "hide";
     const template = `
-        <div id="${componentId}" class="year-picker-container">
+        <div id="${componentId}" class="year-picker-container ${visiableClass}">
           <table>
             <thead>${initTableHead(datasets.ages, datasets.groups)}</thead>
             <tbody>${initTableBody(datasets.groups)}</tbody>
@@ -215,12 +217,13 @@ window.YearPicker = function (container, options = {}) {
   function ShowPicker() {
     const container = document.getElementById(Picker.ComponentId);
     container.className = container.className.replace(/\s?hide/g, "");
+    Picker.Visiable = true;
   }
 
   function HidePicker() {
     const container = document.getElementById(Picker.ComponentId);
     container.className = container.className + " hide";
-
+    Picker.Visiable = false;
     Feedback("submit");
   }
 
@@ -229,7 +232,8 @@ window.YearPicker = function (container, options = {}) {
     Picker.ComponentId = componentId;
 
     Picker.Options = options;
-    const { preselected, range } = options;
+    const { preselected, range, visiable } = options;
+    Picker.Visiable = !!visiable;
 
     // Only handle correct parameters
     if (preselected) {
