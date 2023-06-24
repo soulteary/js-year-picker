@@ -37,7 +37,7 @@ window.YearPicker = function (container, options = {}) {
   function Feedback() {
     if (Picker.Options && Picker.Options.updater && typeof Picker.Options.updater === "function") {
       Picker.Selected.sort((a, b) => a - b);
-      Picker.Options.updater(Picker.Selected);
+      Picker.Options.updater(Picker.Selected, Picker);
     }
   }
 
@@ -220,6 +220,8 @@ window.YearPicker = function (container, options = {}) {
   function HidePicker() {
     const container = document.getElementById(Picker.ComponentId);
     container.className = container.className + " hide";
+
+    Feedback();
   }
 
   function Bootstrap(container, options = {}) {
