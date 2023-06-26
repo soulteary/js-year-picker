@@ -39,8 +39,8 @@ window.YearPicker = function (container, options = {}) {
     const startYearItemList = container.querySelectorAll(`.year-picker-start-box .year-picker-item`);
     const endYearItemList = container.querySelectorAll(`.year-picker-end-box .year-picker-item`);
 
-    updateYearItemSelection(startYearItemList, startYear);
-    updateYearItemSelection(endYearItemList, endYear);
+    updateYearItemSelection(startYearItemList, true);
+    updateYearItemSelection(endYearItemList, false);
   }
 
   const STATE_CLICKABLE = "normal";
@@ -65,6 +65,7 @@ window.YearPicker = function (container, options = {}) {
   }
 
   function ScrollItemIntoView(item) {
+    // FIXME Determine whether you need to slide to avoid unnecessary jumping
     setTimeout(() => {
       item.scrollIntoView({ block: "center" });
     }, 50);
@@ -73,20 +74,23 @@ window.YearPicker = function (container, options = {}) {
   const RENDER_MODE_SAME = "same";
   const RENDER_MODE_START = "start";
   const RENDER_MODE_END = "end";
-  function GetRenderMode(selected) {
+  function GetRenderMode(isStartPicker) {
     const [startYear, endYear] = Picker.Selected;
-    if (selected === startYear) {
+    if (isStartPicker) {
       if (startYear === endYear) {
         return RENDER_MODE_SAME;
       }
       return RENDER_MODE_START;
     }
+    if (startYear === endYear) {
+      return RENDER_MODE_SAME;
+    }
     return RENDER_MODE_END;
   }
 
-  function updateYearItemSelection(itemList, selected) {
+  function updateYearItemSelection(itemList, isStartPicker) {
     const [startYear, endYear] = Picker.Selected;
-    const renderMode = GetRenderMode(selected);
+    const renderMode = GetRenderMode(isStartPicker);
 
     for (let i = 0; i < itemList.length; i++) {
       const item = itemList[i];
@@ -94,20 +98,33 @@ window.YearPicker = function (container, options = {}) {
 
       switch (renderMode) {
         case RENDER_MODE_SAME:
-          if (thisYear === selected) {
-            SetYearItemState(item, STATE_BOUNDARY);
-            ScrollItemIntoView(item);
+          if (isStartPicker) {
+            if (this < startYear) {
+              SetYearItemState(item, STATE_CLICKABLE);
+            } else if (thisYear === startYear) {
+              SetYearItemState(item, STATE_BOUNDARY);
+              ScrollItemIntoView(item);
+            } else {
+              SetYearItemState(item, STATE_DISABLED);
+            }
           } else {
-            SetYearItemState(item, STATE_CLICKABLE);
+            if (thisYear < startYear) {
+              SetYearItemState(item, STATE_DISABLED);
+            } else if (thisYear === endYear) {
+              SetYearItemState(item, STATE_BOUNDARY);
+              ScrollItemIntoView(item);
+            } else {
+              SetYearItemState(item, STATE_CLICKABLE);
+            }
           }
           break;
         case RENDER_MODE_START:
-          if (thisYear < selected) {
+          if (thisYear < startYear) {
             SetYearItemState(item, STATE_CLICKABLE);
-          } else if (thisYear >= endYear) {
+          } else if (thisYear > endYear) {
             SetYearItemState(item, STATE_DISABLED);
           } else {
-            if (thisYear === selected) {
+            if (thisYear === startYear) {
               SetYearItemState(item, STATE_BOUNDARY);
               ScrollItemIntoView(item);
             } else {
@@ -121,7 +138,7 @@ window.YearPicker = function (container, options = {}) {
           } else if (thisYear > endYear) {
             SetYearItemState(item, STATE_CLICKABLE);
           } else {
-            if (thisYear === selected) {
+            if (thisYear === endYear) {
               SetYearItemState(item, STATE_BOUNDARY);
               ScrollItemIntoView(item);
             } else {
