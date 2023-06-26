@@ -26,7 +26,7 @@ window.YearPicker = function (container, options = {}) {
     }
   }
 
-  function UpdateYearSelectedUI() {
+  function UpdateYearSelectedUI(byUser) {
     const container = document.querySelector(`#${Picker.ComponentId}`);
     const [startYear, endYear] = Picker.Selected;
 
@@ -39,8 +39,8 @@ window.YearPicker = function (container, options = {}) {
     const startYearItemList = container.querySelectorAll(`.year-picker-start-box .year-picker-item`);
     const endYearItemList = container.querySelectorAll(`.year-picker-end-box .year-picker-item`);
 
-    updateYearItemSelection(startYearItemList, true);
-    updateYearItemSelection(endYearItemList, false);
+    updateYearItemSelection(startYearItemList, true, byUser);
+    updateYearItemSelection(endYearItemList, false, byUser);
   }
 
   const STATE_CLICKABLE = "normal";
@@ -64,10 +64,13 @@ window.YearPicker = function (container, options = {}) {
     }
   }
 
-  function ScrollItemIntoView(item) {
-    // FIXME Determine whether you need to slide to avoid unnecessary jumping
+  function ScrollItemIntoView(item, byUser) {
     setTimeout(() => {
-      item.scrollIntoView({ block: "center" });
+      if (byUser) {
+        item.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        item.scrollIntoView({ block: "center" });
+      }
     }, 50);
   }
 
@@ -88,7 +91,7 @@ window.YearPicker = function (container, options = {}) {
     return RENDER_MODE_END;
   }
 
-  function updateYearItemSelection(itemList, isStartPicker) {
+  function updateYearItemSelection(itemList, isStartPicker, byUser) {
     const [startYear, endYear] = Picker.Selected;
     const renderMode = GetRenderMode(isStartPicker);
 
@@ -103,7 +106,7 @@ window.YearPicker = function (container, options = {}) {
               SetYearItemState(item, STATE_CLICKABLE);
             } else if (thisYear === startYear) {
               SetYearItemState(item, STATE_BOUNDARY);
-              ScrollItemIntoView(item);
+              ScrollItemIntoView(item, byUser);
             } else {
               SetYearItemState(item, STATE_DISABLED);
             }
@@ -112,7 +115,7 @@ window.YearPicker = function (container, options = {}) {
               SetYearItemState(item, STATE_DISABLED);
             } else if (thisYear === endYear) {
               SetYearItemState(item, STATE_BOUNDARY);
-              ScrollItemIntoView(item);
+              ScrollItemIntoView(item, byUser);
             } else {
               SetYearItemState(item, STATE_CLICKABLE);
             }
@@ -126,7 +129,7 @@ window.YearPicker = function (container, options = {}) {
           } else {
             if (thisYear === startYear) {
               SetYearItemState(item, STATE_BOUNDARY);
-              ScrollItemIntoView(item);
+              ScrollItemIntoView(item, byUser);
             } else {
               SetYearItemState(item, STATE_SELECTED);
             }
@@ -140,7 +143,7 @@ window.YearPicker = function (container, options = {}) {
           } else {
             if (thisYear === endYear) {
               SetYearItemState(item, STATE_BOUNDARY);
-              ScrollItemIntoView(item);
+              ScrollItemIntoView(item, byUser);
             } else {
               SetYearItemState(item, STATE_SELECTED);
             }
@@ -192,7 +195,7 @@ window.YearPicker = function (container, options = {}) {
         Picker.Selected = [year, year];
       }
 
-      UpdateYearSelectedUI();
+      UpdateYearSelectedUI(true);
       Feedback(event);
     }
 
@@ -218,7 +221,7 @@ window.YearPicker = function (container, options = {}) {
         Picker.Selected = [year, year];
       }
 
-      UpdateYearSelectedUI();
+      UpdateYearSelectedUI(true);
       Feedback(event);
     }
 
