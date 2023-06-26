@@ -65,23 +65,9 @@ window.YearPicker = function (container, options = {}) {
 
   function InitBaseContainer(container, componentId, startYear, endYear) {
     function generateYearRange(start, end) {
-      const prefix = start % 5;
-      const append = end % 5;
       let years = [];
-      const lastNum = ("" + end).slice(-1);
-
-      if (prefix > 0) {
-        for (let i = start - prefix; i < start; i++) {
-          years.push({ year: i, state: "disabled" });
-        }
-      }
       for (let i = start; i <= end; i++) {
         years.push({ year: i, state: "normal" });
-      }
-      if (lastNum !== "9" || lastNum !== 4) {
-        for (let i = end + 1; i < end + (5 - append); i++) {
-          years.push({ year: i, state: "disabled" });
-        }
       }
       return years;
     }
