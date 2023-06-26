@@ -157,8 +157,7 @@ window.YearPicker = function (container, options = {}) {
       const target = event.target;
       const container = target.closest(".year-picker-container");
       const yearItem = target.closest(".year-picker-item");
-      if (!yearItem || !container) return;
-      // if (!yearItem || !container || IsDisabled(yearItem)) return;
+      if (!yearItem || !container || IsDisabled(yearItem)) return;
       const year = parseInt(target.innerText);
       const [startYear, endYear] = Picker.Selected;
 
@@ -184,8 +183,7 @@ window.YearPicker = function (container, options = {}) {
       const target = event.target;
       const container = target.closest(".year-picker-container");
       const yearItem = target.closest(".year-picker-item");
-      if (!yearItem || !container) return;
-      // if (!yearItem || !container || IsDisabled(yearItem)) return;
+      if (!yearItem || !container || IsDisabled(yearItem)) return;
       const year = parseInt(target.innerText);
       const [startYear, endYear] = Picker.Selected;
 
