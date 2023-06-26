@@ -15,20 +15,6 @@ window.YearPicker = function (container, options = {}) {
     return this.Selected;
   }
 
-  function SetItemState(item, state) {
-    const YEAR_ITEM_NORMAL = "year-picker-item";
-    const YEAR_ITEM_SELECTED = "year-picker-item year-picker-item-selected";
-    if (!item) return;
-    switch (state) {
-      case "normal":
-        item.className = YEAR_ITEM_NORMAL;
-        break;
-      case "selected":
-        item.className = YEAR_ITEM_SELECTED;
-        break;
-    }
-  }
-
   function IsDisabled(item) {
     return item.classList.contains("year-picker-item-disabled");
   }
@@ -40,41 +26,41 @@ window.YearPicker = function (container, options = {}) {
     }
   }
 
-  function scrollToYear(year) {
-    const startYearPickerItem = document.querySelector(`.year-picker-start-box .year-picker-item[data-year="${year}"]`);
-    const endYearPickerItem = document.querySelector(`.year-picker-end-box .year-picker-item[data-year="${year}"]`);
-    startYearPickerItem.scrollIntoView({ behavior: "smooth", block: "center" });
-    setTimeout(() => {
-      endYearPickerItem.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 100);
-  }
-
-  function updateYearItemSelection(yearItems, selectedYear) {
-    yearItems.forEach(item => {
+  function updateYearItemSelection(itemList, itemPicked, yearSelected) {
+    itemList.forEach((item) => {
       if (IsDisabled(item)) return;
       const itemYear = parseInt(item.innerText);
-      const isSelected = itemYear === selectedYear;
-      const state = isSelected ? "selected" : "normal";
-      SetItemState(item, state);
-      scrollToYear(selectedYear);
+      const isSelected = itemYear === yearSelected;
+
+      if (isSelected) {
+        item.className = "year-picker-item year-picker-item-selected";
+        setTimeout(() => {
+          itemPicked.scrollIntoView({ block: "center" });
+        }, 50);
+      } else {
+        item.className = "year-picker-item";
+      }
     });
   }
 
-  function UpdateUISelected() {
-    const startYear = Picker.Selected[0];
-    const endYear = Picker.Selected[1] ? Picker.Selected[1] : Picker.Selected[0];
+  function UpdateYearSelectedUI() {
+    const container = document.querySelector(`#${Picker.ComponentId}`);
+    const [startYear, endYear] = Picker.Selected;
 
-    const startSelected = document.querySelector(`#${Picker.ComponentId} .year-picker-start-box .year-picker-selected span`);
-    const endSelected = document.querySelector(`#${Picker.ComponentId} .year-picker-end-box .year-picker-selected span`);
+    const labelStart = container.querySelector(`.year-picker-start-box .year-picker-selected span`);
+    const labelEnd = container.querySelector(`.year-picker-end-box .year-picker-selected span`);
 
-    startSelected.innerText = startYear;
-    endSelected.innerText = endYear;
+    labelStart.innerText = startYear;
+    labelEnd.innerText = endYear;
 
-    const startYearItems = document.querySelectorAll(`#${Picker.ComponentId} .year-picker-start-box .year-picker-item`);
-    const endYearItems = document.querySelectorAll(`#${Picker.ComponentId} .year-picker-end-box .year-picker-item`);
+    const startYearItemList = container.querySelectorAll(`.year-picker-start-box .year-picker-item`);
+    const endYearItemList = container.querySelectorAll(`.year-picker-end-box .year-picker-item`);
 
-    updateYearItemSelection(startYearItems, startYear);
-    updateYearItemSelection(endYearItems, endYear);
+    const startYearItemPicked = container.querySelector(`.year-picker-start-box .year-picker-item[data-year="${startYear}"]`);
+    const endYearItemPicked = container.querySelector(`.year-picker-end-box .year-picker-item[data-year="${endYear}"]`);
+
+    updateYearItemSelection(startYearItemList, startYearItemPicked, startYear);
+    updateYearItemSelection(endYearItemList, endYearItemPicked, endYear);
   }
 
   function InitBaseContainer(container, componentId, startYear, endYear) {
@@ -102,7 +88,7 @@ window.YearPicker = function (container, options = {}) {
 
     function initYearBody(years) {
       let tpl = "";
-      years.forEach(yearObj => {
+      years.forEach((yearObj) => {
         const { year, state } = yearObj;
         const itemClass = state === "disabled" ? "year-picker-item year-picker-item-disabled" : "year-picker-item";
         tpl += `<div class="${itemClass}" data-year="${year}">${year}</div>`;
@@ -132,7 +118,7 @@ window.YearPicker = function (container, options = {}) {
         Picker.Selected = [year, year];
       }
 
-      UpdateUISelected();
+      UpdateYearSelectedUI();
       Feedback(event);
     }
 
@@ -158,7 +144,7 @@ window.YearPicker = function (container, options = {}) {
         Picker.Selected = [year, year];
       }
 
-      UpdateUISelected();
+      UpdateYearSelectedUI();
       Feedback(event);
     }
 
@@ -223,24 +209,29 @@ window.YearPicker = function (container, options = {}) {
     const { preselected, range, visiable } = options;
     Picker.Visiable = !!visiable;
 
-    // Only handle correct parameters
     if (preselected) {
       if (typeof preselected === "number") {
-        Picker.Selected = [preselected];
+        Picker.Selected = [preselected, preselected];
       } else if (Array.isArray(preselected) && preselected.length === 2) {
-        Picker.Selected = preselected.map(item => Number(item)).sort((a, b) => a - b);
+        Picker.Selected = preselected.map((item) => Number(item)).sort((a, b) => a - b);
       }
     }
+
+    const [userBeginYear, userEndYear] = range || [1970, new Date().getFullYear()];
+    let [startYear, endYear] = [userBeginYear, userEndYear];
 
     if (Picker.Selected.length === 0) {
       const currentYear = new Date().getFullYear();
       Picker.Selected = [currentYear - 10, currentYear];
+    } else {
+      // auto scale range to include selected year
+      if (startYear > Picker.Selected[0]) startYear = Picker.Selected[0];
+      if (endYear < Picker.Selected[1]) endYear = Picker.Selected[1];
     }
 
-    // create base template
-    const [begin, end] = range || [1970, new Date().getFullYear()];
-    InitBaseContainer(container, componentId, begin, end);
-    UpdateUISelected();
+    InitBaseContainer(container, componentId, startYear, endYear);
+
+    UpdateYearSelectedUI();
 
     Feedback("init");
 
