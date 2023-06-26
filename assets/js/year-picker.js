@@ -99,7 +99,7 @@ window.YearPicker = function (container, options = {}) {
       switch (renderMode) {
         case RENDER_MODE_SAME:
           if (isStartPicker) {
-            if (this < startYear) {
+            if (thisYear < startYear) {
               SetYearItemState(item, STATE_CLICKABLE);
             } else if (thisYear === startYear) {
               SetYearItemState(item, STATE_BOUNDARY);
