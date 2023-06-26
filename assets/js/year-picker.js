@@ -1,5 +1,5 @@
 window.YearPicker = function (container, options = {}) {
-  var Picker = {
+  const Picker = {
     // expose states
     ComponentId: "",
     Options: {},
@@ -30,9 +30,7 @@ window.YearPicker = function (container, options = {}) {
   }
 
   function IsDisabled(item) {
-    if (!item) return true;
-    const isDisabled = (item.className || "").indexOf("year-picker-item-disabled") > -1;
-    return isDisabled;
+    return item.classList.contains("year-picker-item-disabled");
   }
 
   function Feedback(event) {
@@ -42,27 +40,41 @@ window.YearPicker = function (container, options = {}) {
     }
   }
 
-  function UpdateUISelected() {
-    const [startYear, endYear] = Picker.Selected;
-    const yearItems = document.querySelectorAll(`#${Picker.ComponentId} .year-picker-item`);
-    yearItems.forEach((item) => {
+  function scrollToYear(year) {
+    const startYearPickerItem = document.querySelector(`.year-picker-start-box .year-picker-item[data-year="${year}"]`);
+    const endYearPickerItem = document.querySelector(`.year-picker-end-box .year-picker-item[data-year="${year}"]`);
+    startYearPickerItem.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      endYearPickerItem.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  }
+
+  function updateYearItemSelection(yearItems, selectedYear) {
+    yearItems.forEach(item => {
+      if (IsDisabled(item)) return;
       const itemYear = parseInt(item.innerText);
-      if (!IsDisabled(item)) {
-        if (startYear && endYear) {
-          if (itemYear >= startYear && itemYear <= endYear) {
-            SetItemState(item, "selected");
-          } else {
-            SetItemState(item, "normal");
-          }
-        } else {
-          if (itemYear == startYear) {
-            SetItemState(item, "selected");
-          } else {
-            SetItemState(item, "normal");
-          }
-        }
-      }
+      const isSelected = itemYear === selectedYear;
+      const state = isSelected ? "selected" : "normal";
+      SetItemState(item, state);
+      scrollToYear(selectedYear);
     });
+  }
+
+  function UpdateUISelected() {
+    const startYear = Picker.Selected[0];
+    const endYear = Picker.Selected[1] ? Picker.Selected[1] : Picker.Selected[0];
+
+    const startSelected = document.querySelector(`#${Picker.ComponentId} .year-picker-start-box .year-picker-selected span`);
+    const endSelected = document.querySelector(`#${Picker.ComponentId} .year-picker-end-box .year-picker-selected span`);
+
+    startSelected.innerText = startYear;
+    endSelected.innerText = endYear;
+
+    const startYearItems = document.querySelectorAll(`#${Picker.ComponentId} .year-picker-start-box .year-picker-item`);
+    const endYearItems = document.querySelectorAll(`#${Picker.ComponentId} .year-picker-end-box .year-picker-item`);
+
+    updateYearItemSelection(startYearItems, startYear);
+    updateYearItemSelection(endYearItems, endYear);
   }
 
   function InitBaseContainer(container, componentId, startYear, endYear) {
@@ -88,138 +100,114 @@ window.YearPicker = function (container, options = {}) {
       return years;
     }
 
-    function getYearInfo(startYear, endYear) {
-      const yearGroups = [];
-      let ages = {};
-      let tmpArr = [];
-      generateYearRange(startYear, endYear).forEach((item) => {
-        const age = ("" + item.year).slice(2, -1) + "0s";
-        ages[age] = true;
-        tmpArr.push(item);
-        if (tmpArr.length === 5) {
-          yearGroups.push(tmpArr);
-          tmpArr = [];
-        }
+    function initYearBody(years) {
+      let tpl = "";
+      years.forEach(yearObj => {
+        const { year, state } = yearObj;
+        const itemClass = state === "disabled" ? "year-picker-item year-picker-item-disabled" : "year-picker-item";
+        tpl += `<div class="${itemClass}" data-year="${year}">${year}</div>`;
       });
-      return { ages: Object.keys(ages), groups: yearGroups };
+      return tpl;
     }
 
-    function initTableHead(labels, datasets) {
-      let tpl = [];
-      for (let i = 0; i < labels.length; i++) {
-        let useSingleCol = false;
-        if (i === 0) {
-          if (labels.length === 1) {
-            useSingleCol = true;
-          } else if (labels.length > 1) {
-            if (("" + datasets[0][0].year).slice(2, -1) !== ("" + datasets[1][0].year).slice(2, -1)) {
-              useSingleCol = true;
-            }
-          }
-        }
-        if (useSingleCol) {
-          tpl.push(`<th colspan="1">${labels[i]}</th>`);
-        } else {
-          tpl.push(`<th colspan="2">${labels[i]}</th>`);
-        }
-      }
-      return `<tr>${tpl.join("")}</tr>`;
-    }
-
-    function initTableBody(datasets) {
-      let chunks = {};
-      for (let i = 0; i < datasets.length; i++) {
-        const age = ("" + datasets[i][0]).slice(2, -1) + "0s";
-        chunks[age] = chunks[age] || [];
-        chunks[age].push(datasets[i]);
-      }
-
-      let tpl = [];
-      for (let key in chunks) {
-        for (let i = 0; i < chunks[key].length; i++) {
-          tpl.push(`<td>`);
-          for (let j = 0; j < chunks[key][i].length; j++) {
-            const { year, state } = chunks[key][i][j];
-            if (state === "disabled") {
-              tpl.push(`<div class="year-picker-item year-picker-item-disabled">${year}</div>`);
-            } else {
-              tpl.push(`<div class="year-picker-item">${year}</div>`);
-            }
-          }
-          tpl.push("</td>");
-        }
-      }
-      return `<tr>${tpl.join("")}</tr>`;
-    }
-
-    function handleYearSelection(event) {
+    function handleStartYearSelection(event) {
       const target = event.target;
       const container = target.closest(".year-picker-container");
       const yearItem = target.closest(".year-picker-item");
       if (!yearItem || !container || IsDisabled(yearItem)) return;
+      const year = parseInt(target.innerText);
+      const [startYear, endYear] = Picker.Selected;
 
-      const selectedYear = parseInt(yearItem.innerText);
-
-      if (Picker.Selected.length === 0) {
-        SetItemState(yearItem, "selected");
-        Picker.Selected.push(selectedYear);
-      } else if (Picker.Selected.length === 1) {
-        const startYear = Picker.Selected[0];
-        const endYear = selectedYear;
-
-        if (startYear === endYear) {
-          item.className = item.className.replace(/\s?year-picker-item-selected/g, "");
-          Picker.Selected = [];
+      if (startYear && endYear) {
+        if (year <= endYear) {
+          Picker.Selected = [year, endYear];
+        }
+      } else if (startYear) {
+        if (year >= startYear) {
+          Picker.Selected = [startYear, year];
         } else {
-          Picker.Selected.push(endYear);
-
-          const yearItems = container.querySelectorAll(`.year-picker-item`);
-          yearItems.forEach((item) => {
-            const itemYear = parseInt(item.innerText);
-            if (itemYear >= Math.min(startYear, endYear) && itemYear <= Math.max(startYear, endYear)) {
-              SetItemState(item, "selected");
-            } else {
-              if (!IsDisabled(item)) {
-                SetItemState(item, "normal");
-              }
-            }
-          });
+          Picker.Selected = [year, startYear];
         }
       } else {
-        SetItemState(yearItem, "selected");
-        Picker.Selected = [selectedYear];
-
-        const yearItems = container.querySelectorAll(".year-picker-item");
-        yearItems.forEach((item) => {
-          if (item !== yearItem) {
-            item.className = item.className.replace(/\s?year-picker-item-selected/g, "");
-          }
-        });
+        Picker.Selected = [year, year];
       }
 
-      Feedback("change");
+      UpdateUISelected();
+      Feedback(event);
     }
 
-    const datasets = getYearInfo(startYear, endYear);
+    function handleEndYearSelection(event) {
+      const target = event.target;
+      const container = target.closest(".year-picker-container");
+      const yearItem = target.closest(".year-picker-item");
+      if (!yearItem || !container || IsDisabled(yearItem)) return;
+      const year = parseInt(target.innerText);
+      const [startYear, endYear] = Picker.Selected;
+
+      if (startYear && endYear) {
+        if (year >= startYear) {
+          Picker.Selected = [startYear, year];
+        }
+      } else if (endYear) {
+        if (year <= endYear) {
+          Picker.Selected = [year, endYear];
+        } else {
+          Picker.Selected = [endYear, year];
+        }
+      } else {
+        Picker.Selected = [year, year];
+      }
+
+      UpdateUISelected();
+      Feedback(event);
+    }
+
+    const years = generateYearRange(startYear, endYear);
     const visiableClass = Picker.Visiable ? "" : "hide";
     const template = `
-        <div id="${componentId}" class="year-picker-container ${visiableClass}">
-          <table>
-            <thead>${initTableHead(datasets.ages, datasets.groups)}</thead>
-            <tbody>${initTableBody(datasets.groups)}</tbody>
-          </table>
+      <div id="${componentId}" class="year-picker-container ${visiableClass}">
+        <div class="year-picker-box flex flex-row justify-between">
+          <div class="year-picker-start-box">
+            <div class="year-picker-tips">起始时间（年份）</div>
+            <div class="year-picker-selected">
+              <span></span>
+            </div>
+            <div class="year-picker-list">
+              ${initYearBody(years)}
+            </div>
+          </div>
+          <div class="year-picker-line"></div>
+          <div class="year-picker-end-box">
+            <div class="year-picker-tips">结束时间（年份）</div>
+            <div class="year-picker-selected">
+              <span></span>
+            </div>
+            <div class="year-picker-list">
+              ${initYearBody(years)}
+            </div>
+          </div>
         </div>
-      `;
+      </div>
+    `;
     document.querySelector(container).innerHTML = template;
-    document.getElementById(componentId).addEventListener("click", handleYearSelection);
+    const startYearPicker = document.getElementById(componentId).querySelector(".year-picker-start-box");
+    const endYearPicker = document.getElementById(componentId).querySelector(".year-picker-end-box");
+    startYearPicker.addEventListener("click", handleStartYearSelection);
+    endYearPicker.addEventListener("click", handleEndYearSelection);
   }
 
+  /**
+   * Show the region picker
+   */
   function ShowPicker() {
     const container = document.getElementById(Picker.ComponentId);
     container.className = container.className.replace(/\s?hide/g, "");
     Picker.Visiable = true;
   }
 
+  /**
+   * Hide the region picker
+   */
   function HidePicker() {
     const container = document.getElementById(Picker.ComponentId);
     container.className = container.className + " hide";
@@ -239,13 +227,11 @@ window.YearPicker = function (container, options = {}) {
     if (preselected) {
       if (typeof preselected === "number") {
         Picker.Selected = [preselected];
-      } else {
-        if (preselected.length === 2) {
-          Picker.Selected = preselected.map((item) => Number(item)).sort((a, b) => a - b);
-        }
+      } else if (Array.isArray(preselected) && preselected.length === 2) {
+        Picker.Selected = preselected.map(item => Number(item)).sort((a, b) => a - b);
       }
     }
-    // fallback use last ten years
+
     if (Picker.Selected.length === 0) {
       const currentYear = new Date().getFullYear();
       Picker.Selected = [currentYear - 10, currentYear];
