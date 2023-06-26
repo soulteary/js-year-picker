@@ -102,7 +102,7 @@
   left: 0;
   width: 300px;
   z-index: 99;
-  background: #FFFFFF;
+  background: #ffffff;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.12);
 }
 
@@ -124,12 +124,12 @@
   position: relative;
   height: 242px;
   width: 0.5px;
-  background-color: #EAF0F3;
+  background-color: #eaf0f3;
   margin: 0 16px;
 }
 
 .year-picker-container .year-picker-tips {
-  font-family: 'Noto Sans SC';
+  font-family: "Noto Sans SC";
   font-style: normal;
   font-weight: 400;
   font-size: 12px;
@@ -140,7 +140,7 @@
 .year-picker-container .year-picker-selected {
   width: 118px;
   height: 36px;
-  background: #F1F6F8;
+  background: #f1f6f8;
   border-radius: 2px;
   text-align: left;
   padding: 8px 12px;
@@ -148,12 +148,12 @@
 }
 
 .year-picker-container .year-picker-selected span {
-  font-family: 'Noto Sans SC';
+  font-family: "Noto Sans SC";
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #21293C;
+  color: #21293c;
 }
 
 .year-picker-container .year-picker-list {
@@ -162,16 +162,16 @@
   margin-top: 16px;
   overflow-y: scroll;
   scrollbar-width: thin;
-  scrollbar-color: #D9D9D9 transparent;
+  scrollbar-color: #d9d9d9 transparent;
 }
 
 .year-picker-container .year-picker-list::-webkit-scrollbar {
   width: 4px;
-  background: #D9D9D9;
+  background: #d9d9d9;
 }
 
 .year-picker-container .year-picker-list::-webkit-scrollbar-thumb {
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
 }
 
 .year-picker-container .year-picker-list::-webkit-scrollbar-track {
@@ -184,8 +184,8 @@
   height: 36px;
   text-align: left;
   padding: 0 12px;
-  background: #FFFFFF;
-  font-family: 'Noto Sans SC';
+  background: #ffffff;
+  font-family: "Noto Sans SC";
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -197,7 +197,13 @@
 
 .year-picker-container .year-picker-list .year-picker-item-selected {
   color: #667190;
-  background-color: #EAF0F3;
+  background-color: #eaf0f3;
+}
+
+.year-picker-container .year-picker-list .year-picker-item-boundary {
+  color: #667190;
+  font-weight: bold;
+  background-color: #dce3e7;
 }
 
 .year-picker-container .year-picker-list .year-picker-item-disabled {
