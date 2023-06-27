@@ -128,12 +128,12 @@
         });
         let instance2 = YearPicker("#container2", {
             preselected: 2020, range: [2019, 2030], updater: (selected) => {
-                document.getElementById('container2-output').innerHTML =  JSON.stringify(selected);
+                document.getElementById('container2-output').innerHTML = JSON.stringify(selected);
             }
         });
         let instance3 = YearPicker("#container3", {
-            preselected: [2015, 2018], range: [2010, 2025], updater: (selected) => {
-                document.getElementById('container3-output').innerHTML =  JSON.stringify(selected);
+            preselected: [2015, 2018], range: [2010, 2025], visiable: false, updater: (selected) => {
+                document.getElementById('container3-output').innerHTML = JSON.stringify(selected);
             }
         });
         document.getElementById('show-modal').addEventListener('click', () => {
@@ -146,7 +146,10 @@
             instance2.Hide();
             instance3.Hide();
         });
-        document.getElementById('show-modal').click(); // switch modal to show instead of hide (default)
+
+        instance1.Show();
+        instance2.Show();
+
     </script>
 </body>
 
