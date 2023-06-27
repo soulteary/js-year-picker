@@ -154,6 +154,7 @@
   font-size: 14px;
   line-height: 20px;
   color: #21293c;
+  cursor: default;
 }
 
 .year-picker-container .year-picker-list {
