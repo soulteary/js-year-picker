@@ -65,13 +65,30 @@ window.YearPicker = function (container, options = {}) {
   }
 
   function ScrollItemIntoView(item, byUser) {
+    const idx = item.getAttribute("data-idx");
+    const listContainer = item.closest(".year-picker-list");
+
+    let height = 0;
+    try {
+      height = window.getComputedStyle(item).height.replace(/\D/g, "").trim();
+    } catch (e) {
+      height = 36;
+    }
+
+    let listHieght = 0;
+    try {
+      listHieght = window.getComputedStyle(listContainer).height.replace(/\D/g, "").trim();
+    } catch (e) {
+      listHieght = 172;
+    }
+
     setTimeout(() => {
       if (byUser) {
         item.scrollIntoView({ behavior: "smooth", block: "center" });
       } else {
-        item.scrollIntoView({ block: "center" });
+        listContainer.scrollTop = height * idx - listHieght / 2;
       }
-    }, 50);
+    }, 30);
   }
 
   const RENDER_MODE_SAME = "same";
@@ -165,10 +182,10 @@ window.YearPicker = function (container, options = {}) {
     // TODO  public ?
     function initYearBody(years) {
       let tpl = "";
-      years.forEach((yearObj) => {
+      years.forEach((yearObj, idx) => {
         const { year, state } = yearObj;
         const itemClass = state === "disabled" ? "year-picker-item year-picker-item-disabled" : "year-picker-item";
-        tpl += `<div class="${itemClass}" data-year="${year}">${year}</div>`;
+        tpl += `<div class="${itemClass}" data-year="${year}" data-idx="${idx}">${year}</div>`;
       });
       return tpl;
     }
