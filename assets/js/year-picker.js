@@ -66,6 +66,25 @@ window.YearPicker = function (container, options = {}) {
     }
   }
 
+  function CustomScrollTo(container, targetPosition, duration) {
+    const startPosition = container.scrollTop;
+    const distance = targetPosition - startPosition;
+    const startTime = performance.now();
+
+    function scrollStep(timestamp) {
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeProgress = progress * (2 - progress);
+      container.scrollTop = startPosition + distance * easeProgress;
+
+      if (elapsed < duration) {
+        requestAnimationFrame(scrollStep);
+      }
+    }
+
+    requestAnimationFrame(scrollStep);
+  }
+
   function ScrollItemIntoView(item, byUser, isInital) {
     const isFirst = item.getAttribute("data-is-first") === "1";
     const isLast = item.getAttribute("data-is-last") === "1";
@@ -111,9 +130,12 @@ window.YearPicker = function (container, options = {}) {
       })(listContainer, position);
     }
 
+    const targetPosition = Math.max(0, position - listContainer.clientHeight / 8);
+
     setTimeout(() => {
       if (byUser) {
-        item.scrollIntoView({ behavior: "smooth", block: "center" });
+        // item.scrollIntoView({ behavior: "smooth", block: "center" });
+        CustomScrollTo(listContainer, targetPosition, 500);
       } else {
         listContainer.scrollTop = position;
       }
@@ -316,7 +338,7 @@ window.YearPicker = function (container, options = {}) {
     container.className = container.className.replace(/\s?hide/g, "");
     Picker.Visiable = true;
 
-    Object.keys(InitalScrollPatchFn).forEach((key) => {
+    Object.keys(InitalScrollPatchFn).forEach(key => {
       if (typeof InitalScrollPatchFn[key] === "function") {
         InitalScrollPatchFn[key]();
       }
@@ -345,7 +367,7 @@ window.YearPicker = function (container, options = {}) {
       if (typeof preselected === "number") {
         Picker.Selected = [preselected, preselected];
       } else if (Array.isArray(preselected) && preselected.length === 2) {
-        Picker.Selected = preselected.map((item) => Number(item)).sort((a, b) => a - b);
+        Picker.Selected = preselected.map(item => Number(item)).sort((a, b) => a - b);
       }
     }
 
