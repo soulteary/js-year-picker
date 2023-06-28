@@ -101,7 +101,8 @@
   z-index: 99;
   background: #fff;
   box-sizing: border-box;
-  border-radius: 0px 0px 4px 4px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 .year-picker-container .year-picker-box {
@@ -111,7 +112,7 @@
   overflow: hidden;
 }
 
-.year-picker-container .year-picker-star-box,
+.year-picker-container .year-picker-start-box,
 .year-picker-container .year-picker-end-box {
   flex: 1;
   width: 100%;
@@ -136,7 +137,7 @@
 }
 
 .year-picker-container .year-picker-selected {
-  width: 151px;
+  width: 100%;
   height: 36px;
   background: #f1f6f8;
   border-radius: 2px;
@@ -155,7 +156,7 @@
 }
 
 .year-picker-container .year-picker-list {
-  width: 151px;
+  width: 100%;
   height: 172px;
   padding: 8px;
   margin-top: 16px;
@@ -218,7 +219,7 @@
   border-radius: 0px 0px 4px 4px;
 }
 
-.year-picker-bottom .year-picker-cancel-btn {
+.year-picker-bottom .year-picker-cancel {
   font-family: "Noto Sans SC";
   font-style: normal;
   font-weight: 400;
@@ -227,7 +228,7 @@
   color: #708daa;
 }
 
-.year-picker-bottom .year-picker-sure-btn {
+.year-picker-bottom .year-picker-sure {
   font-family: "Noto Sans SC";
   font-style: normal;
   font-weight: 400;

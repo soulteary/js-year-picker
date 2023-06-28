@@ -293,7 +293,7 @@ window.YearPicker = function (container, options = {}) {
     const visiableClass = Picker.Visiable ? "" : "hide";
 
     const template = `
-        <div id="${componentId}" class="year-picker-container choose__in ${visiableClass}">
+        <div id="${Picker.ComponentId}" class="year-picker-container choose__in ${visiableClass}">
           <div class="year-picker-box flex flex-row justify-between">
             <div class="year-picker-start-box">
               <div class="year-picker-tips">起始时间（年份）</div>
@@ -317,11 +317,13 @@ window.YearPicker = function (container, options = {}) {
           </div>
           <div class="year-picker-bottom">
             <div class="flex justify-between">
-              <div id="year-picker-cancel" class="year-picker-cancel-btn">取消</div>
-              <div id="year-picker-sure" class="year-picker-sure-btn">确定</div>
+              <div id="year-picker-cancel" class="year-picker-cancel">取消</div>
+              <div id="year-picker-sure" class="year-picker-sure">确定</div>
             </div>
           </div>
         </div>
+
+        <div id="${Picker.ComponentId}-mask" class="picker-mask ${visiableClass}"></div>
       `;
     document.querySelector(container).innerHTML = template;
     const startYearPicker = document.getElementById(componentId).querySelector(".year-picker-start-box");
@@ -329,15 +331,27 @@ window.YearPicker = function (container, options = {}) {
     startYearPicker.addEventListener("click", handleStartYearSelection);
     endYearPicker.addEventListener("click", handleEndYearSelection);
 
-    watchMaskButtons();
+    watchMaskEvent();
   }
 
-  function watchMaskButtons() {
+  function watchMaskEvent() {
+    const maskContainer = document.getElementById(`${Picker.ComponentId}-mask`);
     const cancelButton = document.getElementById("year-picker-cancel");
     const sureButton = document.getElementById("year-picker-sure");
 
+    maskContainer.addEventListener("click", CancelPicker);
     cancelButton.addEventListener("click", CancelPicker);
     sureButton.addEventListener("click", HidePicker);
+  }
+
+  function showMask() {
+    const maskContainer = document.getElementById(`${Picker.ComponentId}-mask`);
+    maskContainer.className = maskContainer.className.replace(/\s?hide/g, "");
+  }
+
+  function hideMask() {
+    const maskContainer = document.getElementById(`${Picker.ComponentId}-mask`);
+    maskContainer.className = maskContainer.className + " hide";
   }
 
   /**
@@ -353,6 +367,8 @@ window.YearPicker = function (container, options = {}) {
         InitalScrollPatchFn[key]();
       }
     });
+
+    showMask();
   }
 
   /**
@@ -363,6 +379,7 @@ window.YearPicker = function (container, options = {}) {
     container.className = container.className + " hide";
     Picker.Visiable = false;
     Feedback("submit");
+    hideMask();
   }
 
   /**
@@ -372,6 +389,7 @@ window.YearPicker = function (container, options = {}) {
     const container = document.getElementById(Picker.ComponentId);
     container.className = container.className + " hide";
     Picker.Visiable = false;
+    hideMask();
   }
 
   function Bootstrap(container, options = {}) {
