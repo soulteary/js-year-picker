@@ -51,7 +51,7 @@ func MinifyMobile() {
 		log.Fatalln(err)
 	}
 
-	err = os.WriteFile("../assets/css/year-picker.min.mobile.css", []byte(output+"\n"), os.ModePerm)
+	err = os.WriteFile("../assets/css/year-picker.mobile.min.css", []byte(output+"\n"), os.ModePerm)
 	if err != nil {
 		log.Fatalln(err)
 	}
