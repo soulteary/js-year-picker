@@ -69,9 +69,13 @@ window.YearPicker = function (container, options = {}) {
   function CustomScrollTo(container, targetPosition, duration) {
     const startPosition = container.scrollTop;
     const distance = targetPosition - startPosition;
-    const startTime = performance.now();
 
+    let startTime;
     function scrollStep(timestamp) {
+      if (startTime === undefined) {
+        startTime = timestamp;
+      }
+
       const elapsed = timestamp - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const easeProgress = progress * (2 - progress);
@@ -338,7 +342,7 @@ window.YearPicker = function (container, options = {}) {
     container.className = container.className.replace(/\s?hide/g, "");
     Picker.Visiable = true;
 
-    Object.keys(InitalScrollPatchFn).forEach(key => {
+    Object.keys(InitalScrollPatchFn).forEach((key) => {
       if (typeof InitalScrollPatchFn[key] === "function") {
         InitalScrollPatchFn[key]();
       }
@@ -367,7 +371,7 @@ window.YearPicker = function (container, options = {}) {
       if (typeof preselected === "number") {
         Picker.Selected = [preselected, preselected];
       } else if (Array.isArray(preselected) && preselected.length === 2) {
-        Picker.Selected = preselected.map(item => Number(item)).sort((a, b) => a - b);
+        Picker.Selected = preselected.map((item) => Number(item)).sort((a, b) => a - b);
       }
     }
 
